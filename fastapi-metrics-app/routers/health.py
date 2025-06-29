@@ -76,7 +76,15 @@ async def readiness_check() -> Dict[str, str]:
     """
     Kubernetes readiness probe endpoint
     """
-    return {"status": "ready"}
+    try:
+        # Check database connectivity
+        db_healthy = await db_client.health_check()
+        if db_healthy:
+            return {"status": "ready"}
+        else:
+            return {"status": "not ready", "reason": "database not healthy"}
+    except Exception as e:
+        return {"status": "not ready", "reason": f"database check failed: {str(e)}"}
 
 
 @router.get("/health/live", status_code=status.HTTP_200_OK)

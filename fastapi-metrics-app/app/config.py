@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     # Server settings
     host: str = "0.0.0.0"
     port: int = 8000
+
+
+    supabase_url: str = "https://rrruedskgtywicwholhp.supabase.co"
+    supabase_key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycnVlZHNrZ3R5d2ljd2hvbGhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExNzY3ODEsImV4cCI6MjA2Njc1Mjc4MX0.w-mOsCBwi1Kw2sPVTguB5i6u0PhgE-FB4eVbJ7-y96A"
+    supabase_table: str = "data_items"
     
     # Metrics settings
     metrics_path: str = "/metrics"
