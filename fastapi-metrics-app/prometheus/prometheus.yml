@@ -1,0 +1,41 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # FastAPI application metrics
+  - job_name: 'fastapi-metrics-app'
+    static_configs:
+      - targets: ['fastapi-app:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    scrape_timeout: 5s
+    honor_labels: true
+    params:
+      format: ['prometheus']
+
+  # Optional: Node exporter for system metrics (if you want host-level metrics)
+  # - job_name: 'node-exporter'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Storage configuration
+storage:
+  tsdb:
+    retention.time: 15d
+    retention.size: 1GB

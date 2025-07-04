@@ -7,6 +7,8 @@ import psutil
 import os
 from typing import Dict, Any
 
+from app.database import db_client
+
 router = APIRouter(tags=["Health"])
 
 
@@ -20,14 +22,15 @@ async def health_check() -> Dict[str, Any]:
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "service": "FastAPI Metrics Monitoring System",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "database": "Supabase"
     }
 
 
 @router.get("/health/detailed", status_code=status.HTTP_200_OK)
 async def detailed_health_check() -> Dict[str, Any]:
     """
-    Detailed health check with system metrics
+    Detailed health check with system metrics and database status
     Returns comprehensive system and application status
     """
     # Get system information
@@ -39,11 +42,22 @@ async def detailed_health_check() -> Dict[str, Any]:
     process = psutil.Process(os.getpid())
     process_memory = process.memory_info()
     
+    # Check database health
+    try:
+        db_healthy = await db_client.health_check()
+        database_status = "healthy" if db_healthy else "unhealthy"
+    except Exception as e:
+        database_status = f"error: {str(e)}"
+    
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "service": "FastAPI Metrics Monitoring System",
         "version": "1.0.0",
+        "database": {
+            "type": "Supabase",
+            "status": database_status
+        },
         "system": {
             "cpu_percent": cpu_percent,
             "memory": {
@@ -75,6 +89,7 @@ async def detailed_health_check() -> Dict[str, Any]:
 async def readiness_check() -> Dict[str, str]:
     """
     Kubernetes readiness probe endpoint
+    Checks if the application is ready to serve traffic
     """
     try:
         # Check database connectivity

@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+todo.md
+*.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment
+.env
+.env.*
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Monitoring data
+prometheus/
+grafana/
+!prometheus/prometheus.yml
+!grafana/provisioning/
+!grafana/dashboards/

@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # FastAPI Application with Supabase integration
+  fastapi-app:
+    build: .
+    container_name: fastapi-metrics-app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=${DEBUG:-false}
+      - METRICS_COLLECTION_INTERVAL=${METRICS_COLLECTION_INTERVAL:-5}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - SUPABASE_URL=${SUPABASE_URL:-https://rrruedskgtywicwholhp.supabase.co}
+      - SUPABASE_KEY=${SUPABASE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycnVlZHNrZ3R5d2ljd2hvbGhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExNzY3ODEsImV4cCI6MjA2Njc1Mjc4MX0.w-mOsCBwi1Kw2sPVTguB5i6u0PhgE-FB4eVbJ7-y96A}
+      - SUPABASE_TABLE=${SUPABASE_TABLE:-data_items}
+    networks:
+      - monitoring
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:v2.40.7
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME:-15d}'
+      - '--storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE:-1GB}'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - monitoring
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:9.5.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:-admin123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - monitoring
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  monitoring:
+    driver: bridge
