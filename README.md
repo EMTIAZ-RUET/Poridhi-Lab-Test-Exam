@@ -16,10 +16,7 @@ A comprehensive FastAPI application with built-in Prometheus metrics monitoring,
 - [Metrics](#metrics)
 - [Monitoring Setup](#monitoring-setup)
 - [Development](#development)
-- [Deployment](#deployment)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [License](#license)
+
 
 ## Overview
 
@@ -433,80 +430,4 @@ flake8 app/
 # Type checking
 mypy app/
 ```
-
-## Deployment
-
-### Production Deployment
-
-For production deployment, see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) which covers:
-
-- Docker production configuration
-- Kubernetes deployment
-- Cloud platform deployment (AWS, GCP, Azure)
-- Security considerations
-- Performance tuning
-- Backup and recovery
-
-### Environment-Specific Configurations
-
-**Development**:
-```bash
-DEBUG=true
-METRICS_COLLECTION_INTERVAL=5
-CORS_ORIGINS=*
-```
-
-**Production**:
-```bash
-DEBUG=false
-METRICS_COLLECTION_INTERVAL=30
-CORS_ORIGINS=https://yourdomain.com
-```
-
-### Scaling Considerations
-
-1. **Application Scaling**
-   - Horizontal scaling with multiple FastAPI instances
-   - Load balancing with nginx or cloud load balancers
-   - Database connection pooling
-
-2. **Database Scaling**
-   - Supabase automatically handles scaling
-   - Consider read replicas for read-heavy workloads
-   - Monitor database performance in Supabase dashboard
-
-3. **Monitoring Scaling**
-   - Prometheus federation for multi-cluster monitoring
-   - Grafana high availability setup
-   - Long-term metrics storage
-
-## Troubleshooting
-
-### Common Issues
-
-**Database Connection Issues**:
-```bash
-# Check database health
-curl http://localhost:8000/health/database
-
-# Verify Supabase credentials
-echo $SUPABASE_URL
-echo $SUPABASE_KEY
-
-# Check application logs
-docker-compose logs fastapi-app
-```
-
-**Metrics Not Appearing**:
-```bash
-# Check Prometheus targets
-curl http://localhost:9090/targets
-
-# Verify metrics endpoint
-curl http://localhost:8000/metrics
-
-# Check Prometheus configuration
-docker-compose logs prometheus
-```
-
 *
