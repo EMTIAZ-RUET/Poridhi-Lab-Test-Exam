@@ -108,3 +108,18 @@ async def liveness_check() -> Dict[str, str]:
     Kubernetes liveness probe endpoint
     """
     return {"status": "alive"}
+
+
+@router.get("/health/database", status_code=status.HTTP_200_OK)
+async def database_health_check() -> Dict[str, str]:
+    """
+    Database health check endpoint
+    """
+    try:
+        db_healthy = await db_client.health_check()
+        if db_healthy:
+            return {"status": "healthy"}
+        else:
+            return {"status": "unhealthy"}
+    except Exception as e:
+        return {"status": "error", "reason": str(e)}

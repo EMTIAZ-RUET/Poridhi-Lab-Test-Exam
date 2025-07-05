@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # FastAPI Application with Supabase integration
@@ -11,8 +11,8 @@ services:
       - DEBUG=${DEBUG:-false}
       - METRICS_COLLECTION_INTERVAL=${METRICS_COLLECTION_INTERVAL:-5}
       - CORS_ORIGINS=${CORS_ORIGINS:-*}
-      - SUPABASE_URL=${SUPABASE_URL:-https://rrruedskgtywicwholhp.supabase.co}
-      - SUPABASE_KEY=${SUPABASE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycnVlZHNrZ3R5d2ljd2hvbGhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExNzY3ODEsImV4cCI6MjA2Njc1Mjc4MX0.w-mOsCBwi1Kw2sPVTguB5i6u0PhgE-FB4eVbJ7-y96A}
+      - SUPABASE_URL=${SUPABASE_URL:-"https://gricczcxqxqditthkjyd.supabase.co"}
+      - SUPABASE_KEY=${SUPABASE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyaWNjemN4cXhxZGl0dGhranlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3MjQ3NTksImV4cCI6MjA2NzMwMDc1OX0.VIxVB5Tejb9UJmoO3HJgrVTF0HyPUU9WxK_-Kz4Z8nw}
       - SUPABASE_TABLE=${SUPABASE_TABLE:-data_items}
     networks:
       - monitoring
@@ -31,13 +31,13 @@ services:
     ports:
       - "9090:9090"
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME:-15d}'
-      - '--storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE:-1GB}'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME:-15d}"
+      - "--storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE:-1GB}"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
@@ -45,7 +45,15 @@ services:
       - monitoring
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9090/-/healthy",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -69,7 +77,11 @@ services:
       - monitoring
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

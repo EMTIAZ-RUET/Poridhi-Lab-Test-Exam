@@ -5,43 +5,13 @@ Collects CPU, memory, and other system-level metrics
 import time
 import psutil
 import os
-from prometheus_client import Gauge, Counter, Info
+from prometheus_client import Gauge, Info
 from typing import Dict, Any
 import asyncio
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
-
-# System metrics
-process_cpu_seconds_total = Counter(
-    'process_cpu_seconds_total',
-    'Total user and system CPU time spent in seconds'
-)
-
-process_resident_memory_bytes = Gauge(
-    'process_resident_memory_bytes',
-    'Resident memory size in bytes'
-)
-
-process_virtual_memory_bytes = Gauge(
-    'process_virtual_memory_bytes',
-    'Virtual memory size in bytes'
-)
-
-process_start_time_seconds = Gauge(
-    'process_start_time_seconds',
-    'Start time of the process since unix epoch in seconds'
-)
-
-process_open_fds = Gauge(
-    'process_open_fds',
-    'Number of open file descriptors'
-)
-
-process_max_fds = Gauge(
-    'process_max_fds',
-    'Maximum number of open file descriptors'
-)
 
 # System-wide metrics
 system_cpu_usage_percent = Gauge(
@@ -83,11 +53,10 @@ class SystemMetricsCollector:
         app_info.info({
             'version': '1.0.0',
             'name': 'FastAPI Metrics Monitoring System',
-            'python_version': f"{psutil.PYTHON_VERSION}",
+            'python_version': f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
         })
         
-        # Set process start time
-        process_start_time_seconds.set(self.process.create_time())
+        # No need to set process_start_time_seconds, already handled by prometheus_client
     
     async def start_collection(self, interval: int = 5):
         """
@@ -129,34 +98,13 @@ class SystemMetricsCollector:
     async def _collect_process_metrics(self):
         """Collect process-specific metrics"""
         try:
-            # CPU metrics
-            cpu_times = self.process.cpu_times()
-            total_cpu_time = cpu_times.user + cpu_times.system
-            
-            if self._last_cpu_times is not None:
-                cpu_delta = total_cpu_time - self._last_cpu_times
-                process_cpu_seconds_total.inc(cpu_delta)
-            
-            self._last_cpu_times = total_cpu_time
-            
             # Memory metrics
             memory_info = self.process.memory_info()
-            process_resident_memory_bytes.set(memory_info.rss)
-            process_virtual_memory_bytes.set(memory_info.vms)
-            
-            # File descriptor metrics
-            try:
-                num_fds = self.process.num_fds()
-                process_open_fds.set(num_fds)
-                
-                # Get max FDs from system limits
-                import resource
-                max_fds = resource.getrlimit(resource.RLIMIT_NOFILE)[0]
-                process_max_fds.set(max_fds)
-            except (AttributeError, OSError):
-                # num_fds() not available on Windows
-                pass
-                
+            # If you want to expose these, use custom metric names to avoid conflicts
+            # Example:
+            # custom_process_resident_memory_bytes = Gauge('custom_process_resident_memory_bytes', ...)
+            # custom_process_resident_memory_bytes.set(memory_info.rss)
+            pass
         except Exception as e:
             logger.error(f"Error collecting process metrics: {e}")
     
