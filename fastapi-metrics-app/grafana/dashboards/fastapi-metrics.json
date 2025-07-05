@@ -456,9 +456,7 @@
         "orientation": "auto",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": ""
         },
         "showThresholdLabels": false,
@@ -516,9 +514,7 @@
         "pieType": "pie",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": ""
         },
         "tooltip": {
@@ -634,11 +630,7 @@
   "refresh": "5s",
   "schemaVersion": 36,
   "style": "dark",
-  "tags": [
-    "fastapi",
-    "prometheus",
-    "monitoring"
-  ],
+  "tags": ["fastapi", "prometheus", "monitoring"],
   "templating": {
     "list": []
   },
